@@ -157,17 +157,16 @@ var SnakeGame = function(canvas){
 	// draws the snake based on array
 	function drawSnake(){
 		var i,length = snakeBits.length;
+		
+		var h;
+		
 		for(i=0;i<length;i++){
 			colour = "#d00";
 			
 			if(i != 0){
-				if(i % 3 == 0)
-					colour = "#333";
-				else if(i % 2 == 0)
-					colour = "#222";
-				else 
-					colour = "#552020";
+					colour = "hsl("+(Math.round((i/length)*360))+",50%,60%)";
 			}
+			console.log(colour);
 			drawBit(snakeBits[i],colour);
 		}
 	}
