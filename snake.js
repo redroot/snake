@@ -19,6 +19,7 @@ var SnakeGame = function(canvas){
 		PI = Math.PI,
 		MAX_X = 30, // size of game
 		MAX_Y = 20,
+
 		FOOD_GROWTH = 5;
 
 	// get canvas and content
@@ -38,10 +39,12 @@ var SnakeGame = function(canvas){
 	function startGame(){
 		gameSetup();	
 		keyboardListeners();
+		showScores();
 	}
 	
 	//reset game
 	function resetGame(){
+		addScore(score);
 		gameSetup();
 	}
 	
@@ -137,13 +140,11 @@ var SnakeGame = function(canvas){
 		// check collision with sides
 		if(head.x == -1 || head.y == -1
 			|| head.x >= MAX_X|| head.y >= MAX_Y){
-			console.log("Outside the room");
 			resetGame();
 		}
 		
 		// check collison with themselves
 		if(inSnake(head.x, head.y,false)){
-			console.log("Hitting yourself");
 			resetGame();
 		}
 		
@@ -164,9 +165,8 @@ var SnakeGame = function(canvas){
 			colour = "#d00";
 			
 			if(i != 0){
-					colour = "hsl("+(Math.round((i/length)*360))+",50%,60%)";
+					colour = "hsl("+(Math.round((i/length)*360))+",60%,50%)";
 			}
-			console.log(colour);
 			drawBit(snakeBits[i],colour);
 		}
 	}
@@ -178,7 +178,6 @@ var SnakeGame = function(canvas){
 			
 		if(inSnake(x,y,true)) {
 			placeFood();
-			console.log("tryfoodagain");
 		}else{			
 			food = {x: x, y: y};
 		}
@@ -235,15 +234,85 @@ var SnakeGame = function(canvas){
 		
 	}
 	
-	// set the score
-	function setScore(){
-		$("h2 span").text(score);
-	}
+
 	
 	// bit method for creating bit objects
 	function bit(x, y){
 		return { x: x, y: y };
 	}
+	
+///// score functions ////
+
+	// set the score
+	function setScore(){
+		$("h2 span").text(score);
+	}
+
+	// show the scoreboard
+	function showScores(){
+		if (typeof(localStorage) == "undefined" ) {
+			alert('You browser doesn\'t have support for HTML5 localStorage, so high scores are not possible');
+		}
+		else{
+			$("#scores").fadeIn("slow");
+			
+			if(localStorage.getItem("snakeScores") != null){
+				updateScores();
+				
+			}else{
+				var newli = $("<li></li>").text("You have no scores yet!");
+				$("#scores ol").append(newli);
+			}
+		}
+	}
+	
+	// updates the highest scores
+	function addScore(score){
+	
+		var stored = localStorage.getItem("snakeScores");
+		
+		if(localStorage.getItem("snakeScores") != null){
+		
+			var scores = stored.split("xxx").map(Number);
+			
+			// add new score 
+			scores.push(parseInt(score));
+			
+			// sort numerically
+			scores.sort(function(a,b){return a-b;}).reverse();
+			
+			// now pop off the end
+			while(scores.length > 5){
+				scores.pop();
+			}
+			
+			localStorage.setItem("snakeScores",scores.join("xxx"));
+			
+		}else{
+		
+			localStorage.setItem("snakeScores",score);
+			
+		}
+		
+		updateScores();
+	}
+	
+	// puts the latest scores on the list
+	function updateScores(){
+	
+		var scores = localStorage.getItem("snakeScores").split("xxx");
+		var ol = $("#scores ol");
+		
+		// remove all current ones
+		ol.find("li").fadeOut("slow").remove();
+		
+		for(var i = 0; i < 5; i++){
+			ol.append($('<li></li>').html(scores[i]));
+		}
+	
+	}
+	
+	
 	
 ///// return /////
 	
@@ -253,9 +322,48 @@ var SnakeGame = function(canvas){
 	};
 };
 
+// wipe scores
+function wipeScores(){
+	try{
+		localStorage.removeItem("snakeScores");
+		$("#scores ol li").fadeOut("slow").remove();
+	}catch(e){
+		console.log(e);
+	}
+}
 
 // launcch
 $(function(){
 	window.game = SnakeGame("#game");
 	game.start();
 });
+
+// utility functions thanks to Joe Lambert @joelambert and Paul Irish
+window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       || 
+              window.webkitRequestAnimationFrame || 
+              window.mozRequestAnimationFrame    || 
+              window.oRequestAnimationFrame      || 
+              window.msRequestAnimationFrame     || 
+              function(/* function */ callback, /* DOMElement */ element){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
+
+window.requestTimeout = function(fn, delay) {
+    if( !window.requestAnimationFrame       && 
+        !window.webkitRequestAnimationFrame && 
+        !window.mozRequestAnimationFrame    && 
+        !window.oRequestAnimationFrame      && 
+        !window.msRequestAnimationFrame)
+            return window.setTimeout(fn, delay);
+
+    var start = new Date().getTime();
+    (function loop(){
+        var current = new Date().getTime(),
+            delta = current - start;
+
+        delta >= delay ? fn.call() : requestAnimFrame(loop);
+    })();
+};
+
