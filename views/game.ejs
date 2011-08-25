@@ -1,0 +1,56 @@
+<!doctype>
+<html>
+<head>
+	<title>Game fun | HTML5</title>
+	<style type="text/css">
+		body { background: #001425; color: #f0f0f0; font-size: 90%; padding:  10px; }
+		h1,h2 {font-family: "Helvetica Neue",Arial, Helvetica, sans-serif; }
+		canvas { margin: 20px; background: #eff; border: 10px solid #abb;float: left; }
+		
+		#counter {
+			float: left; 
+			padding-left: 20px;
+		}
+		
+		h2.border {
+			margin-top: 10px;
+			padding-top: 10px;
+			border-top: 1px solid #fff;
+		}
+		
+		#scores {
+			display:none;	
+font-family: "Helvetica Neue",Arial, Helvetica, sans-serif;			
+		}
+			#score ol {
+				list-style: none;
+			}
+			#scores li {
+				padding: 5px 0px;
+			}
+			
+		
+	</style>
+</head>
+<body>
+
+<canvas id="game" height="400" width="600"></canvas>
+<div id="counter">
+	<h1>SN4KE</h1>
+	<h2>Current Score: <span>0</span></h2>
+	<div id="scores">
+		<h2 class="border">Your Highest Scores</h2>
+		<ol>
+		
+		</ol>
+		<input type="button" name="wipeScores" value="Wipe Scores" onclick="wipeScores();" id="wipeScores" />
+	</div>
+</div>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script> 
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/control.js" ></script>
+<script src="/snake.js" ></script>
+
+</body>
+</html>
